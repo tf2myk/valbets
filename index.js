@@ -1,9 +1,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, messageLink } = require('discord.js');
 const { token } = require('./config.json');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages,] });
 
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
@@ -15,9 +15,25 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
+
 client.once(Events.ClientReady, () => {
 	console.log('Ready!');
 });
+
+
+client.on('messageCreate', (message) => {
+	//console.log(message.content);
+	//console.log(message.author);
+	if(message.author.bot && message.author.username == "valbets" && message.content.includes("PREDICTIONS"))
+	{
+		//console.log(`The bot said: ${message.content}`);
+		console.log("Bot started predicitions");
+		message.react('😄')
+			.then(() => message.react('🙁'))
+			.catch(error => console.error('One of the emojis failed to react:', error));
+	}
+});
+
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;

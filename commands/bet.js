@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { request } = require('undici');
+const { Client, GatewayIntentBits } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,16 +23,13 @@ module.exports = {
 
 
 		taginput.replace('#', '');
-		taginput.replace(' ', '%20');
+		nameinput.replace(' ', '%20');
 		
         catResult = await request(`https://api.henrikdev.xyz/valorant/v3/matches/na/${nameinput}/${taginput}?filter=competitive`);
 		file  = await catResult.body.json();
-
+		
 		everyone = file.data[0].players.all_players;
 		winningteam = file.data[0].teams;
-		map = file.data[0].metadata.map;
-		date = file.data[0].metadata.game_start_patched;
-		console.log(map);
 		blueteam = false;
 		redteam = false;
 		winmessage = "";
@@ -44,8 +42,6 @@ module.exports = {
 
 		var player = {};
 
-		//console.log(oldname);
-
 		for (keys in everyone) 
 		{
 			//console.log(everyone[keys].name.toLowerCase());
@@ -57,10 +53,7 @@ module.exports = {
 			}
 		}
 
-		
 
-		
-		
 		statkills = player.stats.kills;
 		statdeaths = player.stats.deaths;
 		statassists = player.stats.assists;
@@ -71,8 +64,11 @@ module.exports = {
 		{winmessage = "WIN";}
 		if(player.team == "Blue" && blueteam)
 		{winmessage = "WIN"}
-
+		message = `\`\`\`     PREDICTIONS FOR  ${player.name.toUpperCase()}        \`\`\``
+		await interaction.reply(message);
 		
+
+		/*
 		return interaction.reply({ content: `\`\`\`
 	RESULT: ${winmessage}
 		Alias: ${player.name} 
@@ -80,7 +76,7 @@ module.exports = {
 		Deaths: ${statdeaths}
 		Assists: ${statassists}\`\`\`
 		`});
-		
+		*/
 
 		//return interaction.reply(`${date}, ${map}`);
 		

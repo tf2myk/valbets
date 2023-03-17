@@ -18,23 +18,33 @@ module.exports = {
 
 		nameinput = interaction.options.getString('name') ?? 'No name provided';
 		taginput = interaction.options.getString('tag') ?? 'No tag provided';
+		if(nameinput = "")
+		{return interaction.reply(`No tag entered`);}
+		if(nameinput = "")
+		{return interaction.reply(`No name entered`);}
+
+		
 		oldname = nameinput.toLowerCase();
 
 
 		taginput.replace('#', '');
-		taginput.replace(' ', '%20');
+		nameinput.replace(' ', '%20');
 		
         catResult = await request(`https://api.henrikdev.xyz/valorant/v3/matches/na/${nameinput}/${taginput}?filter=competitive`);
 		file  = await catResult.body.json();
 
+		console.log(file);
+		
+		
 		everyone = file.data[0].players.all_players;
 		winningteam = file.data[0].teams;
 		map = file.data[0].metadata.map;
-		date = file.data[0].metadata.game_start_patched;
-		console.log(map);
+		matchident = file.data[0].metadata.matchid;
+		//console.log(map);
 		blueteam = false;
 		redteam = false;
-		winmessage = "";
+		winmessage = "LOSS";
+		
 
 
 		if(winningteam.red.has_won)
@@ -72,7 +82,9 @@ module.exports = {
 		if(player.team == "Blue" && blueteam)
 		{winmessage = "WIN"}
 
-		
+		console.log(`${player.name}'s stats have been pulled`);
+
+
 		return interaction.reply({ content: `\`\`\`
 	RESULT: ${winmessage}
 		Alias: ${player.name} 
@@ -81,8 +93,8 @@ module.exports = {
 		Assists: ${statassists}\`\`\`
 		`});
 		
-
-		//return interaction.reply(`${date}, ${map}`);
+		
+		return interaction.reply(`Test`);
 		
 
 	},
