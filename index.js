@@ -34,6 +34,17 @@ client.on('messageCreate', (message) => {
 	}
 });
 
+/*
+
+const filter = (reaction, user) => {
+	return reaction.emoji.name === '😄' && message.content.includes("PREDICTIONS") && message.author.username == "valbets";
+};
+const collector = message.createReactionCollector({ filter});
+
+collector.on('collect', (reaction, user) => {
+	console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+});
+*/
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
