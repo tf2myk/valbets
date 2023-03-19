@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { request } = require('undici');
 const { Client, GatewayIntentBits } = require('discord.js');
+var player = {};
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,26 +22,30 @@ module.exports = {
 		taginput = interaction.options.getString('tag') ?? 'No tag provided';
 		oldname = nameinput.toLowerCase();
 
+		await interaction.deferReply({ ephemeral: false });
+
 
 		taginput.replace('#', '');
 		nameinput.replace(' ', '%20');
 		
         catResult = await request(`https://api.henrikdev.xyz/valorant/v3/matches/na/${nameinput}/${taginput}?filter=competitive`);
 		file  = await catResult.body.json();
-		
-		everyone = file.data[0].players.all_players;
-		winningteam = file.data[0].teams;
-		blueteam = false;
-		redteam = false;
-		winmessage = "";
 
 
-		if(winningteam.red.has_won)
-		{redteam = true;}
-		else 
-		{blueteam = true;}
-
-		var player = {};
+		try
+		{
+			everyone = file.data[0].players.all_players;
+			winningteam = file.data[0].teams;
+			map = file.data[0].metadata.map;
+			matchident = file.data[0].metadata.matchid;
+			blueteam = false;
+			redteam = false;
+			winmessage = "LOSS";
+		}
+		catch(e)
+		{
+			return interaction.editReply("Couldnt find your name && tag");
+		}
 
 		for (keys in everyone) 
 		{
@@ -48,37 +53,17 @@ module.exports = {
 			if(everyone[keys].name.toLowerCase() == oldname)
 			{
 				player = everyone[keys];
-				//console.log(player);
+				console.log(player.name);
 				
 			}
 		}
 
-
-		statkills = player.stats.kills;
-		statdeaths = player.stats.deaths;
-		statassists = player.stats.assists;
 		
+		message = `\`\`\`     PREDICTIONS FOR  ${player.name.toUpperCase()}        `
+		message = message.concat("```");
+		//message = `Vote to start predictions for ${player.name.toUpperCase()}`;
+		await interaction.editReply(message);
 		
-		
-		if(player.team == "Red" && redteam)
-		{winmessage = "WIN";}
-		if(player.team == "Blue" && blueteam)
-		{winmessage = "WIN"}
-		message = `\`\`\`     PREDICTIONS FOR  ${player.name.toUpperCase()}        \`\`\``
-		await interaction.reply(message);
-		
-
-		/*
-		return interaction.reply({ content: `\`\`\`
-	RESULT: ${winmessage}
-		Alias: ${player.name} 
-		Kills: ${statkills}
-		Deaths: ${statdeaths}
-		Assists: ${statassists}\`\`\`
-		`});
-		*/
-
-		//return interaction.reply(`${date}, ${map}`);
 		
 
 	},

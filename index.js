@@ -3,7 +3,7 @@ const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, messageLink } = require('discord.js');
 const { token } = require('./config.json');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages,] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions] });
 
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
@@ -21,7 +21,8 @@ client.once(Events.ClientReady, () => {
 });
 
 
-client.on('messageCreate', (message) => {
+//client.on('messageCreate', (oldmessage, message) => {
+	client.on('messageUpdate', (oldmessage, message) => {
 	//console.log(message.content);
 	//console.log(message.author);
 	if(message.author.bot && message.author.username == "valbets" && message.content.includes("PREDICTIONS"))
@@ -34,17 +35,54 @@ client.on('messageCreate', (message) => {
 	}
 });
 
-/*
 
-const filter = (reaction, user) => {
-	return reaction.emoji.name === '😄' && message.content.includes("PREDICTIONS") && message.author.username == "valbets";
-};
-const collector = message.createReactionCollector({ filter});
+client.on("messageReactionAdd", function(messageReaction, user){
 
-collector.on('collect', (reaction, user) => {
-	console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+	if(!user.bot && messageReaction.message.content.includes("PREDICTIONS") && messageReaction.message.author.username == "valbets")
+	{
+		//console.log(messageReaction.emoji);
+		
+		hold = messageReaction.message.content;
+		hold2 = hold.substring(0, hold.length-3);
+		//console.log(messageReaction.emoji);
+
+		if(messageReaction.emoji.name == '😄')
+		{
+				hold3 = hold2.concat
+			(`
+			
+			${user.username} :: WIN` 
+			);
+
+			hold3 = hold3.concat("```"); 
+			messageReaction.message.edit(hold3);
+			console.log("updated");
+		}
+
+		if(messageReaction.emoji.name == '🙁')
+		{
+				hold3 = hold2.concat
+			(`
+			
+			${user.username} :: LOSE` 
+			);
+
+			hold3 = hold3.concat("```"); 
+			messageReaction.message.edit(hold3);
+			console.log("updated");
+		}
+		
+
+		
+		
+	}
+
+	
 });
-*/
+
+
+
+
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
