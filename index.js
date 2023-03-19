@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, messageLink } = require('discord.js');
 const { token } = require('./config.json');
+const reactioncheck = new Map();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions] });
 
@@ -37,40 +38,45 @@ client.once(Events.ClientReady, () => {
 
 
 client.on("messageReactionAdd", function(messageReaction, user){
-
 	if(!user.bot && messageReaction.message.content.includes("PREDICTIONS") && messageReaction.message.author.username == "valbets")
 	{
+		
+
+		if(reactioncheck.get(user.username) != messageReaction.message.id)
+		{
+			reactioncheck.set(user.username, messageReaction.message.id)
+			hold = messageReaction.message.content;
+			hold2 = hold.substring(0, hold.length-3);
+
+			if(messageReaction.emoji.name == '😄')
+			{
+					hold3 = hold2.concat
+				(`
+				
+				${user.username} :: WIN` 
+				);
+
+				hold3 = hold3.concat("```"); 
+				messageReaction.message.edit(hold3);
+				console.log("updated");
+			}
+
+			if(messageReaction.emoji.name == '🙁')
+			{
+					hold3 = hold2.concat
+				(`
+				
+				${user.username} :: LOSE` 
+				);
+
+				hold3 = hold3.concat("```"); 
+				messageReaction.message.edit(hold3);
+				console.log("updated");
+			}
+		}
 		//console.log(messageReaction.emoji);
 		
-		hold = messageReaction.message.content;
-		hold2 = hold.substring(0, hold.length-3);
-		//console.log(messageReaction.emoji);
-
-		if(messageReaction.emoji.name == '😄')
-		{
-				hold3 = hold2.concat
-			(`
-			
-			${user.username} :: WIN` 
-			);
-
-			hold3 = hold3.concat("```"); 
-			messageReaction.message.edit(hold3);
-			console.log("updated");
-		}
-
-		if(messageReaction.emoji.name == '🙁')
-		{
-				hold3 = hold2.concat
-			(`
-			
-			${user.username} :: LOSE` 
-			);
-
-			hold3 = hold3.concat("```"); 
-			messageReaction.message.edit(hold3);
-			console.log("updated");
-		}
+		
 		
 
 		
